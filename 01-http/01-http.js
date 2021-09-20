@@ -1,8 +1,9 @@
 const http = require('http')
 const fs = require('fs')
+const { isForXStatement } = require('babel-types')
 
 http.createServer((req, res) => {
-    const {url, method} = req
+    const {url, method, headers} = req
     if (url === '/' && method === 'GET') {
         fs.readFile('index.html', (err, data) => {
             // 出错
@@ -19,6 +20,15 @@ http.createServer((req, res) => {
             res.end(data)
         })
     }
+    else if (url === '/users' && method === 'GET') {
+        res.writeHead(200, {'Content-Type': 'application/json'})
+        res.end(JSON.stringify({name: 'Charles'}))
+    }
+    else if (method === 'GET' && header.accept.indexOf('image/*') !== -1) {
+        // 图片
+        fs.readFile('1.png')
+    }
+
     else {
         res.statusCode = 404
         res.setHeader('Content-Type', 'text/plain; charset=utf-8')
