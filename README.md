@@ -19,5 +19,5 @@
 
 * 脚手架：teach-koa-setup
 * webpack练习![webpack](https://LeonhardE.github.io/images/Bytedance/webpack.png)
-* rollup练习![rollup](https://LeonhardE.github.io/images/Bytedance/rollup.png)
+* rollup练习![rollup](https://LeonhardE.github.io/images/Bytedance/rollup2.png)
 
