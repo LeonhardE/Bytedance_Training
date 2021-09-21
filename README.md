@@ -14,3 +14,10 @@
 ![Day1_2](https://LeonhardE.github.io/images/Day1_2.png)
 
 ![Day1_3](https://LeonhardE.github.io/images/Day1_3.png)
+
+## Day2
+
+* 脚手架：teach-koa-setup
+* webpack练习![webpack](https://LeonhardE.github.io/images/Bytedance/webpack.png)
+* rollup练习![rollup](https://LeonhardE.github.io/images/Bytedance/rollup.png)
+
