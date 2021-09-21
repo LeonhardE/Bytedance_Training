@@ -1,0 +1,19 @@
+{
+    <% if (info) { %>
+        "name": "<%=name%>",
+        "type": "<%=type%>",
+        "version": "<%=version%>",
+    <% } %>
+    "scripts": {
+      "test": "rm -rf ./haha && node index.js"
+    },
+    "main": "index.js",
+    "license": "MIT",
+    <% if (dependencies) { %>
+        "dependencies": {
+            "ejs": "<%=ejs%>",
+            "koa": "<%=koa%>",
+            "koa-router": "<%=router%>"
+        }
+    <% } %>
+  }
