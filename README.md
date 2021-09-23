@@ -26,3 +26,6 @@
 * antdesign主页![antdesign](https://LeonhardE.github.io/images/Bytedance/antdesign.png)
 * my-react![my-react](https://LeonhardE.github.io/images/Bytedance/my-react.png)
 
+## Day4
+
+* 完成一个淘宝小黑盒移动端页面（尚未完工，目前进度图![progress](https://LeonhardE.github.io/images/Bytedance/progress.png)

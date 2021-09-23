@@ -1,0 +1,136 @@
+body {
+    margin: 0;
+    font-size: 4vw;
+    line-height: 1.5;
+    background-color: rgb(242, 242, 242);
+}
+
+ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+#banner {
+    position: relative;
+    height: 24.63vh;
+    width: 100vw;
+    overflow: hidden;
+    text-align: center;
+}
+
+#banner_pic {
+    display: flex;
+    transform: translateX(0);
+}
+
+#banner_pic li {
+    flex: none;
+    width: 100vw;
+}
+
+#banner_pic img {
+    display: block;
+    width: 100%;
+}
+
+#banner_nav {
+    position: absolute;
+    left: 4.27vw;
+    bottom: 9.1vw;
+}
+
+#banner_nav span {
+    float: left;
+    margin: 0.5vw;
+    width: 2.67vw;
+    height: 1vw;
+    background: #fff;
+    border-radius: 0.5vw;
+}
+
+#banner_nav span.active {
+    background: blue;
+}
+
+#banner-bottom {
+    position: relative;
+    height: 4.56vh;
+    width: 100vw;
+    margin-top: -2.59vh;
+    margin-bottom: 1.33vw;
+    text-align: center;
+}
+
+#banner-bottom img {
+    display: block;
+    width: 100%;
+}
+
+#prize-box {
+    position: relative;
+    height: 4.56vh;
+    width: 100vw;
+    text-align: center;
+}
+
+#prize-box img {
+    display: block;
+    width: 100%;
+}
+
+#card-area {
+    position: relative;
+    height: 11.1vh;
+    width: 100vw;
+    margin-left: 2.1vw;
+}
+
+#card-box {
+    display: inline-grid;
+    height: 11.1vh;
+    width: 46.4vw;
+    margin-left: 0.5vw;
+    margin-right: 0.5vw;
+    border-radius: 2.67vw;
+    background-color: #fff;
+}
+
+#card-box p {
+    position: relative;
+    left: 2.67vw;
+    top: -2vw;
+}
+
+.toy {
+    position: relative;
+    left: 24vw;
+    bottom: 11vw;
+    height: 18.67vw;
+    width: 18.67vw;
+}
+
+.shoe {
+    position: relative;
+    left: 24vw;
+    bottom: 7vw;
+    height: 9.6vw;
+    width: 18.67vw;
+}
+
+#my-brand {
+    position: relative;
+    width: 94.67vw;
+    height: 18vh;
+    margin: 2.67vw;
+    background-color: #fff;
+    border-radius: 2.67vw;
+}
+
+#new-things {
+    position: relative;
+    width: 100vw;
+    height: 48.77vh;
+    background-color: #fff;
+    border-radius: 2.67vw;
+}
