@@ -24,8 +24,34 @@
                             // 2.1 处理template：编译
                             options.render = this.complie(parent.innerHTML)
                         }
+                        // 其他选项和setup兼容
+                        if (options.setup) {
+                            this.setupState = options.setup() 
+                        }
+                        if (options.data) {
+                            this.data = options.data()
+                        }
+                        const proxy = new Proxy(this, {
+                            get(target, key) {
+                                // 先在setup中找，如果找不到再去data
+                                if (target.setupState && key in target.setupState) {
+                                    return target.setupState[key]
+                                }
+                                else {
+                                    return target.data[key]
+                                }
+                            },
+                            set(target, key, val) {
+                                if (target.setupState && key in target.setupState) {
+                                    target.setupState[key] = val
+                                }
+                                else {
+                                    target.data[key] = val
+                                }
+                            }
+                        })
                         // 2.2 用户提供render
-                        const el = options.render.call(options.data())
+                        const el = options.render.call(proxy)
                         // 3. 追加到宿主
                         parent.innerHTML = ''
                         parent.appendChild(el)
@@ -48,6 +74,11 @@
             data() {
                 return {
                     title: 'hello, vue3!'
+                }
+            },
+            setup() {
+                return {
+                    title: 'vue3, hello!'
                 }
             }
         })
