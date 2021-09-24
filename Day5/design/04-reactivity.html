@@ -89,31 +89,90 @@
     </script>
 
     <script>
+        // 能够拦截用户对代理对象的访问
+        // 从而在值发生变化时做出相应
         function reactive(obj) {
-            // 能够拦截用户对代理对象的访问
-            // 从而在值发生变化时做出相应
             return new Proxy(obj, {
                 get(target, key) {
                     console.log('get key: ', key)
+                    track(target, key)
                     return target[key]
                 },
                 set(target, key, val) {
                     console.log('set key: ', key)
                     target[key] = val
+                    trigger(target, key)
                     // 通知更新
-                    app.update()
+                    // app.update()
                 }
             })
         }
+
+        const effectStack = []
+        // 调用effect，会首先执行fn，关联target 和 key
+        function effect(fn) {
+            const eff = function() {
+                try {
+                    effectStack.push(eff)
+                    fn()
+                }
+                finally {
+                    effectStack.pop()
+                }
+            }
+            // 立即调用一次
+            eff()
+            return eff
+        }
+
+        const targetMap = {}
+        // 建立target、key和副作用函数之间的关系
+        function track(target, key) {
+            const effect = effectStack[effectStack.length - 1]
+            // 判断target作为key的对象是否存在
+            let map = targetMap[target]
+            if (!map) {
+                // 首次get这个target
+                map = targetMap[target] = {}
+            }
+            let deps = map[key]
+            if (!deps) {
+                deps = map[key] = []
+            }
+            // 建立映射关系
+            if (deps.indexOf(effect) === -1) {
+                deps.push(effect)
+            }
+        }
+
+        function trigger(target, key) {
+            const map = targetMap[target]
+            if (map) {
+                const deps = map[key]
+                if (deps) {
+                    deps.forEach(dep => dep())
+                }
+            }
+        }
+
+        const obj = reactive({
+            foo: 'foo'
+        })
+
+        effect(() => {
+            // 触发响应式数据
+            console.log(obj.foo)
+        })
+        obj.foo = 'foohhhhhhh'
 
         const app = Vue.createApp({
             setup() {
                 const state = reactive({
                     title: 'vue3, hello!'
                 })
-                setTimeout(() => {
-                    state.title = 'hello vue3!'
-                }, 2000)
+                // setTimeout(() => {
+                //     state.title = 'hello vue3!'
+                // }, 2000)
                 return state
             }
         })
