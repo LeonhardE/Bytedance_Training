@@ -97,12 +97,17 @@
                                             }                                        
                                         }
                                         else {
-
+                                            // 老的是字符串，新的是数组
+                                            // 替换文本为一组子元素
+                                            // 清空再创建并追加
+                                            el.textContent = ''
+                                            newCh.forEach(child => insert(this.createElm(child), el))
                                         }
                                     }
                                     else {
                                         if (typeof newCh === 'string') {
-
+                                            // 替换一组子元素为文本
+                                            el.textContent = newCh
                                         }
                                         else {
 
@@ -135,7 +140,12 @@
                                     // const title = document.createElement('h1')
                                     // title.textContent = this.title
                                     // return title
-                                    return h('h1', null, this.title)
+                                    if (Array.isArray(this.title)) {
+                                        return h('h1', null, this.title.map(s => h('p', null, s)))
+                                    }
+                                    else {
+                                        return h('h1', null, this.title)
+                                    }
                                     // return h('h1', null, [
                                     //     h('p', null, this.title),
                                     //     h('p', null, this.title),
@@ -247,7 +257,8 @@
                     title: 'vue3, hello!'
                 })
                 setTimeout(() => {
-                    state.title = 'hello vue3!'
+                    // state.title = 'hello vue3!'
+                    state.title = 'hello vue3!!'.split('')
                 }, 2000)
                 return state
             }
