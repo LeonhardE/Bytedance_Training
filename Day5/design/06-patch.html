@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="app">
+        {{title}}
+    </div>
+
+    <script>
+        function h(tag, props, children) {
+            return {tag, props, children}
+        }
+
+        const Vue = {
+            // 拓展性
+            createRenderer({querySelector, insert, createElement}) {
+                return {
+                    createApp(options) {
+                        return {
+                            mount(selector) {
+                                // console.log("mount!")
+                                // 1. 找到宿主元素
+                                const parent = document.querySelector(selector)
+                                // 2. 渲染页面
+                                if (!options.render) {
+                                    // 2.1 处理template：编译
+                                    options.render = this.complie(parent.innerHTML)
+                                }
+                                // 其他选项和setup兼容
+                                if (options.setup) {
+                                    this.setupState = options.setup() 
+                                }
+                                if (options.data) {
+                                    this.data = options.data()
+                                }
+                                const proxy = new Proxy(this, {
+                                    get(target, key) {
+                                        // 先在setup中找，如果找不到再去data
+                                        if (target.setupState && key in target.setupState) {
+                                            return target.setupState[key]
+                                        }
+                                        else {
+                                            return target.data[key]
+                                        }
+                                    },
+                                    set(target, key, val) {
+                                        if (target.setupState && key in target.setupState) {
+                                            target.setupState[key] = val
+                                        }
+                                        else {
+                                            target.data[key] = val
+                                        }
+                                    }
+                                })
+                                // 2.2 用户提供render
+                                this.update = effect(() => {
+                                    // const el = options.render.call(proxy)
+                                    // // 3. 追加到宿主
+                                    // parent.innerHTML = ''
+                                    // parent.appendChild(el)
+                                    const vnode = options.render.call(proxy)
+                                    // 转换vnode=>dom
+                                    // 初始化是创建整棵树
+                                    if (!this.isMounted) {
+                                        // 实现createElement
+                                        const el = this.createElm(vnode)
+                                        parent.innerHTML = ''
+                                        insert(el, parent)
+                                        this.isMounted = true
+                                    }
+                                    else {
+                                        this.patch(this._vnode, vnode)
+                                    }
+                                    this._vnode = vnode
+                                })
+                            // this.update()
+                            },
+                            patch(n1, n2) {
+                                const el = n2.el = n1.el
+                                // n1 old n2 new
+                                if (n1.tag === n2.tag && n1.key === n2.key) {
+                                    // 相同结点，更新
+                                    // props todo
+                                    // children
+                                    const oldCh = n1.children
+                                    const newCh = n2.children
+                                    if (typeof oldCh === 'string') {
+                                        if (typeof newCh === 'string') {
+                                            // text update
+                                            if (oldCh !== newCh) {
+                                                el.textContent = newCh
+                                            }                                        
+                                        }
+                                        else {
+
+                                        }
+                                    }
+                                    else {
+                                        if (typeof newCh === 'string') {
+
+                                        }
+                                        else {
+
+                                        }
+                                    }
+                                }
+                                else {
+                                    // 替换
+                                }
+                            },
+                            createElm(vnode) {
+                                const {tag, props, children} = vnode
+                                // 遍历vnode，创建整棵树
+                                const el = createElement(tag)
+                                // el.setAttribute(key, val)
+                                // 判断children的类型
+                                if (typeof children === 'string') {
+                                    el.textContent = children
+                                }
+                                else {
+                                    children.forEach(child => insert(this.createElm(child), el))
+                                }
+                                // vnode要保存真实属性
+                                vnode.el = el
+                                return el
+                            },
+                            complie(template) {
+                                // 返回一个render函数
+                                return function render() {
+                                    // const title = document.createElement('h1')
+                                    // title.textContent = this.title
+                                    // return title
+                                    return h('h1', null, this.title)
+                                    // return h('h1', null, [
+                                    //     h('p', null, this.title),
+                                    //     h('p', null, this.title),
+                                    //     h('p', null, this.title),
+                                    // ])
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            createApp(options) {
+                const renderer = Vue.createRenderer({
+                    querySelector(sel) {
+                        return document.querySelector(sel)
+                    },
+                    insert(el, parent) {
+                        parent.appendChild(el)
+                    },
+                    createElement(tag) {
+                        return document.createElement(tag)
+                    }
+                })
+                return renderer.createApp(options)
+            }
+        }
+    </script>
+
+    <script>
+        // 能够拦截用户对代理对象的访问
+        // 从而在值发生变化时做出相应
+        function reactive(obj) {
+            return new Proxy(obj, {
+                get(target, key) {
+                    console.log('get key: ', key)
+                    track(target, key)
+                    return target[key]
+                },
+                set(target, key, val) {
+                    console.log('set key: ', key)
+                    target[key] = val
+                    trigger(target, key)
+                    // 通知更新
+                    // app.update()
+                }
+            })
+        }
+
+        const effectStack = []
+        // 调用effect，会首先执行fn，关联target 和 key
+        function effect(fn) {
+            const eff = function() {
+                try {
+                    effectStack.push(eff)
+                    fn()
+                }
+                finally {
+                    effectStack.pop()
+                }
+            }
+            // 立即调用一次
+            eff()
+            return eff
+        }
+
+        const targetMap = {}
+        // 建立target、key和副作用函数之间的关系
+        function track(target, key) {
+            const effect = effectStack[effectStack.length - 1]
+            // 判断target作为key的对象是否存在
+            let map = targetMap[target]
+            if (!map) {
+                // 首次get这个target
+                map = targetMap[target] = {}
+            }
+            let deps = map[key]
+            if (!deps) {
+                deps = map[key] = []
+            }
+            // 建立映射关系
+            if (deps.indexOf(effect) === -1) {
+                deps.push(effect)
+            }
+        }
+
+        function trigger(target, key) {
+            const map = targetMap[target]
+            if (map) {
+                const deps = map[key]
+                if (deps) {
+                    deps.forEach(dep => dep())
+                }
+            }
+        }
+
+        // const obj = reactive({
+        //     foo: 'foo'
+        // })
+
+        // effect(() => {
+        //     // 触发响应式数据
+        //     console.log(obj.foo)
+        // })
+        // obj.foo = 'foohhhhhhh'
+
+        const app = Vue.createApp({
+            setup() {
+                const state = reactive({
+                    title: 'vue3, hello!'
+                })
+                setTimeout(() => {
+                    state.title = 'hello vue3!'
+                }, 2000)
+                return state
+            }
+        })
+        app.mount('#app')
+    </script>
+</body>
+</html>
