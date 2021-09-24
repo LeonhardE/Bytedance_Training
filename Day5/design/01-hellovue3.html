@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="app">
+        {{title}}
+        <comp v-model="foo"></comp>
+    </div>
+
+    <script src="http://unpkg.com/vue@next"></script>
+    <script>
+        // app create
+        // new Vue
+        const app = Vue.createApp({
+            data() {
+                return {
+                    title: 'hello, vue3!'
+                }
+            },
+            setup() {
+                // 优先级比data更高
+                const state = Vue.reactive({
+                    title: 'vue3, hello!'
+                })
+                return state
+            }
+            // render() {
+            //     return Vue.h('div', {
+            //         title: this.title
+            //     })
+            // }
+        })
+        // app.component('comp', {
+        //     template: ''
+        // })
+        app.mount('#app')
+    </script>
+</body>
+</html>
